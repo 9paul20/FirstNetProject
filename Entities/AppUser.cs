@@ -10,6 +10,10 @@ public class AppUser
     public int Id { get; set; }
 
     public required string UserName { get; set; }
+
+    public required byte[] PasswordHash { get; set; }
+
+    public required byte[] PasswordSalt { get; set; }
 }
 
 public class AppUserValidator : AbstractValidator<AppUser>
@@ -21,18 +25,30 @@ public class AppUserValidator : AbstractValidator<AppUser>
         _context = context;
 
         RuleFor(user => user.Id)
-            .GreaterThanOrEqualTo(0).WithMessage("Id must be greater than or equal to 0.");
+            .GreaterThanOrEqualTo(0)
+            .WithMessage("Id must be greater than or equal to 0.");
 
         RuleFor(user => user.UserName)
-            .NotEmpty().WithMessage("UserName is required.")
-            .Length(3, 100).WithMessage("UserName must be between 3 and 100 characters.")
-            .Matches("^[a-zA-Z0-9]*$").WithMessage("UserName must contain only letters and numbers.")
-            .MustAsync(BeUniqueUserName).WithMessage("UserName must be unique.");
+            .NotEmpty()
+            .WithMessage("UserName is required.")
+            .Length(3, 100)
+            .WithMessage("UserName must be between 3 and 100 characters.")
+            .Matches("^[a-zA-Z0-9]*$")
+            .WithMessage("UserName must contain only letters and numbers.")
+            .MustAsync(BeUniqueUserName)
+            .WithMessage("UserName must be unique.");
     }
 
-    private async Task<bool> BeUniqueUserName(AppUser user, string userName, CancellationToken cancellationToken)
+    private async Task<bool> BeUniqueUserName(
+        AppUser user,
+        string userName,
+        CancellationToken cancellationToken
+    )
     {
-        return !await _context.Users.AnyAsync(u => u.UserName == userName && u.Id != user.Id, cancellationToken);
+        return !await _context.Users.AnyAsync(
+            u => u.UserName == userName && u.Id != user.Id,
+            cancellationToken
+        );
     }
 }
 

@@ -1,5 +1,6 @@
 using System;
 using FluentValidation.Results;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApi.Data;
@@ -7,11 +8,10 @@ using WebApi.Entities;
 
 namespace WebApi.Controllers;
 
-[ApiController]
-[Route("api/[controller]")]
-public class UsersController(DataContext context) : ControllerBase
+[Authorize]
+public class UsersController(DataContext context) : BaseAPIController
 {
-
+    [AllowAnonymous]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<AppUser>>> GetUsers()
     {
@@ -25,6 +25,7 @@ public class UsersController(DataContext context) : ControllerBase
         return Ok(users);
     }
 
+    [Authorize]
     [HttpGet("{id:int}")]
     public async Task<ActionResult<AppUser>> GetUser(int id)
     {
@@ -110,7 +111,6 @@ public class UsersController(DataContext context) : ControllerBase
             context.Users.Remove(user);
 
             await context.SaveChangesAsync();
-
         }
 
         return Ok(user);
