@@ -21,7 +21,7 @@ public class TokenService(IConfiguration config) : ITokenService
         }
         else if (tokenKey.Length < 64)
         {
-            throw new Exception("TokenKey must be at least 16 characters long");
+            throw new Exception("TokenKey must be at least 64 characters long");
         }
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenKey));
